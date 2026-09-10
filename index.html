@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS Parcha Generator</title>
+    <!-- Include html2pdf library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f4f9;
+            --primary-color: #333;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .form-container, .preview-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        .form-container h2 {
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .form-row > div {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #555;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 20px 0 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        /* POS Receipt Styling */
+        #receipt-wrapper {
+            width: 320px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+        }
+        .receipt {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #000;
+        }
+        .receipt .divider {
+            border-bottom: 1px dashed #000;
+            margin: 8px 0;
+        }
+        .receipt .bold-divider {
+            border-bottom: 1px solid #000;
+            margin: 8px 0;
+        }
+        .receipt .row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .receipt .item-title {
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        .receipt .item-details {
+            display: flex;
+            justify-content: space-between;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #fff;
+        }
+        .btn-print { background-color: #28a745; }
+        .btn-pdf { background-color: #007bff; }
+        button:hover { opacity: 0.9; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #receipt-wrapper, #receipt-wrapper * { visibility: visible; }
+            #receipt-wrapper {
+                position: absolute;
+                left: 0;
+                top: 0;
+                border: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Form Section -->
+    <div class="form-container">
+        <h2>Enter Details</h2>
+        
+        <div class="form-group">
+            <label>Party Name</label>
+            <input type="text" id="partyName" value="ATAK SALES (LUCKNOW)" oninput="generateReceipt()">
+        </div>
+        <div class="form-row">
+            <div>
+                <label>Gaadi No.</label>
+                <input type="text" id="gaadiNo" value="UP95T3405" oninput="generateReceipt()">
+            </div>
+            <div>
+                <label>Date</label>
+                <input type="text" id="date" value="10/09/2026" oninput="generateReceipt()">
+            </div>
+        </div>
+
+        <!-- Items dynamically generated for simplicity -->
+        <div class="section-title">Item 1</div>
+        <div class="form-row">
+            <div><label>Description (e.g. 10 KGS SHAKTIMAN)</label><input type="text" id="item1Desc" value="10 KGS SHAKTIMAN" oninput="generateReceipt()"></div>
+            <div><label>Bundles</label><input type="number" id="item1Bundles" value="730" oninput="generateReceipt()"></div>
+        </div>
+        <div class="form-row">
+            <div><label>Weight (kg)</label><input type="number" id="item1Weight" value="7300" oninput="generateReceipt()"></div>
+            <div><label>Rate (/kg)</label><input type="number" id="item1Rate" value="75" oninput="generateReceipt()"></div>
+        </div>
+
+        <div class="section-title">Item 2</div>
+        <div class="form-row">
+            <div><label>Description</label><input type="text" id="item2Desc" value="20 KGS SHAKTIMAN" oninput="generateReceipt()"></div>
+            <div><label>Bundles</label><input type="number" id="item2Bundles" value="5" oninput="generateReceipt()"></div>
+        </div>
+        <div class="form-row">
+            <div><label>Weight (kg)</label><input type="number" id="item2Weight" value="85" oninput="generateReceipt()"></div>
+            <div><label>Rate (/kg)</label><input type="number" id="item2Rate" value="74.50" oninput="generateReceipt()"></div>
+        </div>
+
+        <div class="section-title">Item 3</div>
+        <div class="form-row">
+            <div><label>Description</label><input type="text" id="item3Desc" value="5FT 4X4 CLF" oninput="generateReceipt()"></div>
+            <div><label>Bundles</label><input type="number" id="item3Bundles" value="157" oninput="generateReceipt()"></div>
+        </div>
+        <div class="form-row">
+            <div><label>Weight (kg)</label><input type="number" id="item3Weight" value="2640" oninput="generateReceipt()"></div>
+            <div><label>Rate (/kg)</label><input type="number" id="item3Rate" value="74.00" oninput="generateReceipt()"></div>
+        </div>
+
+        <div class="section-title">Additional Charges</div>
+        <div class="form-row">
+            <div><label>Loading</label><input type="number" id="loading" value="1704" oninput="generateReceipt()"></div>
+            <div><label>Insurance</label><input type="number" id="insurance" value="265" oninput="generateReceipt()"></div>
+        </div>
+    </div>
+
+    <!-- Preview Section -->
+    <div class="preview-container">
+        <h2>Parcha Preview</h2>
+        
+        <div id="receipt-wrapper">
+            <div class="receipt" id="receipt">
+                <!-- Receipt content injected by JS -->
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn-print" onclick="window.print()">🖨️ Print Receipt</button>
+            <button class="btn-pdf" onclick="downloadPDF()">📄 Download PDF</button>
+        </div>
+    </div>
+
+    <script>
+        function formatMoney(amount) {
+            return parseFloat(amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function padRight(text, length) {
+            text = text.toString();
+            return text.length < length ? text + '&nbsp;'.repeat(length - text.length) : text;
+        }
+
+        function generateReceipt() {
+            // Get form values
+            const partyName = document.getElementById('partyName').value.toUpperCase();
+            const gaadiNo = document.getElementById('gaadiNo').value.toUpperCase();
+            const date = document.getElementById('date').value;
+
+            const loading = parseFloat(document.getElementById('loading').value) || 0;
+            const insurance = parseFloat(document.getElementById('insurance').value) || 0;
+
+            let itemsHTML = '';
+            let subtotal = 0;
+
+            // Process Items (Loop through the 3 static items)
+            for (let i = 1; i <= 3; i++) {
+                const desc = document.getElementById(`item${i}Desc`).value.toUpperCase();
+                const bundles = document.getElementById(`item${i}Bundles`).value;
+                const weight = parseFloat(document.getElementById(`item${i}Weight`).value) || 0;
+                const rate = parseFloat(document.getElementById(`item${i}Rate`).value) || 0;
+                
+                if (desc && weight && rate) {
+                    const amount = weight * rate;
+                    subtotal += amount;
+                    
+                    itemsHTML += `
+                        <div class="item-title">${desc} (${bundles} BUNDLES)</div>
+                        <div class="item-details">
+                            <span>${weight} kg @ ${rate.toFixed(2)} /kg</span>
+                            <span>${formatMoney(amount)}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            const grandTotal = subtotal + loading + insurance;
+
+            // Build Receipt HTML
+            const receiptHTML = `
+                <div class="bold-divider"></div>
+                <div class="row"><span>PARTY</span><span>: ${partyName}</span></div>
+                <div class="row"><span>GAADI NO.</span><span>: ${gaadiNo}</span></div>
+                <div class="row"><span>DATE</span><span>: ${date}</span></div>
+                <div class="divider"></div>
+                <div class="row" style="font-weight:bold;">
+                    <span>ITEM DETAILS</span><span>AMOUNT</span>
+                </div>
+                <div class="divider"></div>
+                
+                ${itemsHTML}
+                
+                <div class="divider"></div>
+                <div class="row"><span>SUBTOTAL</span><span>${formatMoney(subtotal)}</span></div>
+                <div class="row"><span>LOADING</span><span>${formatMoney(loading)}</span></div>
+                <div class="row"><span>INSURANCE</span><span>${formatMoney(insurance)}</span></div>
+                <div class="bold-divider"></div>
+                <div class="row" style="font-weight:bold; font-size:14px;">
+                    <span>GRAND TOTAL (INR)</span><span>${formatMoney(grandTotal)}</span>
+                </div>
+                <div class="bold-divider"></div>
+            `;
+
+            document.getElementById('receipt').innerHTML = receiptHTML;
+        }
+
+        // Generate the PDF using html2pdf
+        function downloadPDF() {
+            const element = document.getElementById('receipt-wrapper');
+            const opt = {
+                margin:       5,
+                filename:     'parcha.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: [80, 200], orientation: 'portrait' } // 80mm roll width
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // Initialize on page load
+        window.onload = generateReceipt;
+    </script>
+</body>
+</html>
