@@ -3,57 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POS Parcha Generator</title>
+    <title>POS Parcha Generator - Batman Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f4f4f9;
-            --primary-color: #333;
-            --receipt-bg: #f8f5ea; 
-            --receipt-text: #222;
+            /* Batman Theme Colors */
+            --bg-color: #07090f;
+            --surface: #12151c;
+            --input-bg: #040508;
+            --text-main: #e0e6ed;
+            --text-muted: #7b849c;
+            --bat-yellow: #ffcc00;
+            --bat-glow: rgba(255, 204, 0, 0.25);
+            --danger-red: #ff3333;
+            
+            /* Dark Receipt */
+            --receipt-bg: #1a1e29; 
+            --receipt-text: #f0f4f8;
         }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: var(--bg-color);
+            font-family: 'Rajdhani', sans-serif;
             margin: 0;
-            padding: 15px;
+            padding: 30px 15px;
+            min-height: 100vh;
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 24px;
             justify-content: center;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(255, 204, 0, 0.05) 0%, transparent 50%),
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            color: var(--text-main);
         }
+
         .container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background: var(--surface);
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 204, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255,255,255,0.05);
             width: 100%;
-            max-width: 450px;
+            max-width: 480px;
         }
+
         .header-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(255, 204, 0, 0.2);
+            padding-bottom: 15px;
         }
-        h2 { margin: 0; font-size: 20px; }
         
-        /* Language Toggle Button */
+        h2 { 
+            margin: 0; 
+            font-size: 26px; 
+            font-weight: 700;
+            color: var(--bat-yellow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--bat-glow);
+        }
+
+        /* Tactical Button */
         .lang-btn {
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            padding: 5px 10px;
+            background-color: transparent;
+            color: var(--bat-yellow);
+            border: 1px solid var(--bat-yellow);
+            padding: 6px 14px;
             border-radius: 4px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 700;
             font-size: 14px;
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
         }
-        .lang-btn:hover { background-color: #e0e0e0; }
+        .lang-btn:hover {
+            background-color: var(--bat-yellow);
+            color: #000;
+            box-shadow: 0 0 15px var(--bat-glow);
+        }
 
+        /* Inputs */
         .form-row {
             display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 16px;
+            margin-bottom: 16px;
         }
         .form-row > div {
             flex: 1;
@@ -61,213 +102,324 @@
             flex-direction: column;
         }
         label {
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 4px;
-            color: #555;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         input, textarea {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-            font-family: Arial, sans-serif;
-            box-sizing: border-box;
+            padding: 12px 14px;
+            border: 1px solid #2a2e3d;
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            background: var(--input-bg);
+            color: var(--text-main);
+            transition: all 0.2s ease;
         }
-        input[type="checkbox"] {
-            width: auto;
-            padding: 0;
-            margin: 0 4px 0 0;
-            vertical-align: middle;
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--bat-yellow);
+            box-shadow: 0 0 8px var(--bat-glow);
         }
-        textarea { resize: vertical; }
+        input::placeholder, textarea::placeholder { color: #3a4154; }
+        
+        /* Checkbox */
+        input[type="checkbox"] { 
+            appearance: none;
+            width: 16px; height: 16px;
+            border: 1px solid var(--bat-yellow);
+            border-radius: 3px;
+            margin: 0 6px 0 0;
+            position: relative;
+            cursor: pointer;
+        }
+        input[type="checkbox"]:checked { background: var(--bat-yellow); }
+        input[type="checkbox"]:checked::after {
+            content: '✔';
+            color: #000;
+            position: absolute;
+            font-size: 12px;
+            top: -1px; left: 2px;
+        }
+
+        /* Sections */
+        .section-divider {
+            margin: 28px 0 16px; 
+            font-size: 16px; 
+            font-weight: 700;
+            color: var(--bat-yellow);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px dashed rgba(255, 204, 0, 0.2);
+            padding-bottom: 5px;
+        }
         
         .item-block {
-            border: 1px solid #eee;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            background: #fafafa;
+            border: 1px solid #2a2e3d;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            background: rgba(0,0,0,0.3);
             position: relative;
+            transition: all 0.2s ease;
+        }
+        .item-block:hover {
+            border-color: rgba(255, 204, 0, 0.5);
         }
         .remove-btn {
             position: absolute;
             top: -10px;
             right: -10px;
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            font-weight: bold;
-            line-height: 1;
-            padding: 0;
-        }
-        .add-item-btn {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 12px;
+            background: var(--input-bg);
+            color: var(--danger-red);
+            border: 1px solid var(--danger-red);
             border-radius: 4px;
+            width: 26px;
+            height: 26px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .remove-btn:hover { background: var(--danger-red); color: white; box-shadow: 0 0 10px rgba(255, 51, 51, 0.4); }
+        
+        .add-item-btn {
+            background: rgba(255, 204, 0, 0.05);
+            color: var(--bat-yellow);
+            border: 1px dashed var(--bat-yellow);
+            padding: 12px;
+            border-radius: 6px;
             cursor: pointer;
             width: 100%;
-            font-weight: bold;
-            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 24px;
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+        }
+        .add-item-btn:hover { background: var(--bat-yellow); color: #000; box-shadow: 0 0 15px var(--bat-glow); }
+
+        /* --- Dark Tactical Receipt Styling --- */
+        .receipt-shadow-box {
+            position: relative;
+            padding: 0 10px 15px;
+            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.8));
         }
 
-        /* --- Updated Receipt Styling --- */
         #receipt-wrapper {
             width: 340px; 
             margin: 0 auto;
             background-color: var(--receipt-bg);
-            padding: 20px;
+            padding: 25px 20px;
             box-sizing: border-box;
             display: block; 
             position: relative;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+            border-top: 1px solid #3a4154;
+            border-bottom: 1px solid #3a4154;
+        }
+
+        #receipt-wrapper::before, #receipt-wrapper::after {
+            content: '';
+            position: absolute;
+            left: 0; right: 0;
+            height: 8px;
+            background-size: 16px 16px;
+        }
+        #receipt-wrapper::before {
+            top: -8px;
+            background-image: linear-gradient(-45deg, transparent 75%, var(--receipt-bg) 75%), linear-gradient(45deg, transparent 75%, var(--receipt-bg) 75%);
+            background-position: 0 0, 0 0;
+        }
+        #receipt-wrapper::after {
+            bottom: -8px;
+            background-image: linear-gradient(135deg, transparent 75%, var(--receipt-bg) 75%), linear-gradient(-135deg, transparent 75%, var(--receipt-bg) 75%);
+            background-position: 0 0, 0 0;
         }
         
         .receipt {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
+            font-size: 14.5px;
             line-height: 1.5;
             color: var(--receipt-text);
         }
         
-        .receipt .dashed-divider { border-bottom: 1px dashed #a09d94; margin: 12px 0; }
-        .receipt .solid-divider { border-bottom: 1px solid var(--receipt-text); margin: 12px 0; }
+        .receipt .dashed-divider { border-bottom: 1.5px dashed #4a5568; margin: 12px 0; }
+        .receipt .solid-divider { border-bottom: 1.5px solid var(--receipt-text); margin: 12px 0; }
         
-        .receipt .row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+        .receipt .row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 5px; }
         .receipt .row > span:first-child { flex-shrink: 0; }
         .receipt .row > span:last-child { text-align: right; word-break: break-all; }
         
-        .receipt .item-title { margin-top: 10px; }
+        .receipt .item-title { margin-top: 12px; font-weight: bold; color: var(--bat-yellow); }
         .receipt .item-details { display: flex; justify-content: space-between; align-items: flex-start; }
-        .receipt .item-rate { max-width: 50%; }
+        .receipt .item-rate { max-width: 50%; color: #a0aec0; }
         
         .receipt .grand-total-box {
-            background-color: #e8e4d8;
-            padding: 10px;
-            border-radius: 6px;
+            background-color: rgba(255, 204, 0, 0.1);
+            padding: 12px;
+            border-radius: 4px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
-            margin: 12px 0;
+            margin: 15px 0;
+            border: 1px solid var(--bat-yellow);
+            color: var(--bat-yellow);
         }
 
         .receipt .notes-section {
             font-size: 13px;
-            margin-top: 10px;
+            margin-top: 15px;
             white-space: pre-wrap; 
             word-wrap: break-word;
+            font-style: italic;
+            color: #a0aec0;
         }
 
-        .actions { margin-top: 20px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+        /* Action Buttons */
+        .actions { margin-top: 30px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
         button.action-btn {
-            padding: 10px 12px;
+            padding: 12px 20px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-weight: bold;
-            color: #fff;
-            flex: 1 1 30%;
+            font-weight: 700;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Rajdhani', sans-serif;
+            transition: all 0.2s ease;
+            flex: 1 1 25%;
         }
-        .btn-print { background-color: #6c757d; }
-        .btn-pdf { background-color: #007bff; }
-        .btn-whatsapp { background-color: #25D366; } /* WhatsApp Green */
-        button:hover { opacity: 0.9; }
+        .btn-print { background-color: #2d3748; color: #fff; }
+        .btn-pdf { background-color: var(--bat-yellow); color: #000; box-shadow: 0 0 10px var(--bat-glow); }
+        .btn-whatsapp { background-color: #075e54; color: #fff; border: 1px solid #128c7e; } 
+        button.action-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
 
+        /* Print Mode: Forces Black and White to save ink */
         @media print {
-            body { background: white; margin: 0; padding: 0; }
+            body { background: white !important; margin: 0; padding: 0; display: block; }
             .hide-on-print { display: none !important; }
-            .container { box-shadow: none; margin: 0; padding: 0; width: 100%; max-width: 100%; }
+            .container { box-shadow: none; margin: 0; padding: 0; width: 100%; max-width: 100%; border: none; background: none; }
+            .receipt-shadow-box { filter: none; padding: 0; }
+            
             #receipt-wrapper { 
-                padding: 0; 
+                padding: 10px; 
                 width: 100%; 
                 max-width: 340px; 
                 margin: 0 auto; 
-                box-shadow: none; 
+                background-color: white !important;
+                border: none;
             }
+            #receipt-wrapper::before, #receipt-wrapper::after { display: none; }
+            .receipt, .receipt .item-title, .receipt .item-rate, .receipt .notes-section { color: black !important; text-shadow: none; }
+            .receipt .solid-divider { border-color: black !important; }
+            .receipt .dashed-divider { border-color: #888 !important; }
+            .receipt .grand-total-box { background-color: white !important; border: 1px solid black !important; color: black !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Form Section -->
+    <!-- Batcomputer Dashboard -->
     <div class="container hide-on-print">
         <div class="header-row">
-            <h2>Parcha Details</h2>
+            <h2>🦇 PARCHA SYSTEM</h2>
             <button class="lang-btn" onclick="toggleLanguage()" id="langToggle">EN / हिंदी</button>
         </div>
         
         <div id="mainForm" oninput="generateReceipt()">
+            <!-- Autocomplete Datalists -->
+            <datalist id="partyList"></datalist>
+            <datalist id="placeList"></datalist>
+            <datalist id="gaadiList"></datalist>
+            <datalist id="descList"></datalist>
+
             <div class="form-row">
                 <div>
-                    <label>Party Name</label>
-                    <input type="text" id="partyName" list="partyList" value="" onblur="saveParty(this.value)">
-                    <datalist id="partyList"></datalist>
+                    <label>Party ID</label>
+                    <input type="text" id="partyName" list="partyList" placeholder="TARGET NAME" onblur="saveData('savedParties', this.value, 'partyList')">
                 </div>
-                <div><label>Place</label><input type="text" id="place" value=""></div>
+                <div>
+                    <label>Location</label>
+                    <input type="text" id="place" list="placeList" placeholder="SECTOR" onblur="saveData('savedPlaces', this.value, 'placeList')">
+                </div>
             </div>
             <div class="form-row">
-                <div><label>Gaadi No.</label><input type="text" id="gaadiNo" value=""></div>
-                <div><label>Date</label><input type="text" id="date" value=""></div>
+                <div>
+                    <label>Vehicle No.</label>
+                    <input type="text" id="gaadiNo" list="gaadiList" placeholder="UNIT IDENTIFIER" onblur="saveData('savedGaadis', this.value, 'gaadiList')">
+                </div>
+                <div>
+                    <label>Timestamp</label>
+                    <input type="text" id="date" value="">
+                </div>
             </div>
 
-            <h3 style="font-size: 16px; margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Items</h3>
+            <div class="section-divider">Payload Data</div>
             <div id="items-container"></div>
-            <button class="add-item-btn" onclick="addItem()">+ Add Item</button>
+            <button class="add-item-btn" onclick="addItem()">[+] ADD PAYLOAD</button>
 
-            <h3 style="font-size: 16px; margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Charges & Advances</h3>
+            <div class="section-divider">Financials & Logistics</div>
             <div class="form-row">
-                <div><label>Loading (₹)</label><input type="number" id="loading" value=""></div>
-                <div><label>Transport (₹)</label><input type="number" id="transport" value=""></div>
+                <div><label>Handling (₹)</label><input type="number" id="loading" placeholder="0"></div>
+                <div><label>Transit (₹)</label><input type="number" id="transport" placeholder="0"></div>
             </div>
             <div class="form-row">
                 <div>
                     <label style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>Insurance (₹)</span>
-                        <span style="font-weight: normal; font-size: 11px; cursor: pointer;">
-                            <input type="checkbox" id="autoInsure"> Auto
+                        <span>Security/Ins. (₹)</span>
+                        <span style="font-weight: 700; font-size: 12px; cursor: pointer; color: var(--bat-yellow);">
+                            <input type="checkbox" id="autoInsure"> AUTO
                         </span>
                     </label>
-                    <input type="number" id="insurance" value="">
+                    <input type="number" id="insurance" placeholder="0">
                 </div>
-                <div><label>Advance Received (₹)</label><input type="number" id="advance" value=""></div>
+                <div><label>Advance (₹)</label><input type="number" id="advance" placeholder="0"></div>
             </div>
             
-            <div class="form-row" style="margin-top: 10px;">
+            <div class="form-row" style="margin-top: 8px;">
                 <div style="flex: 1;">
-                    <label>Notes / Remarks</label>
-                    <textarea id="notes" rows="2" placeholder="Enter any extra details here..."></textarea>
+                    <label>Encrypted Notes</label>
+                    <textarea id="notes" rows="2" placeholder="Mission parameters or specific instructions..."></textarea>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Preview Section -->
-    <div class="container">
-        <h2 class="hide-on-print" style="margin-bottom: 15px;">Live Preview</h2>
+    <!-- Live Preview Section -->
+    <div class="container" style="background: rgba(18, 21, 28, 0.7); border-color: transparent;">
+        <div class="header-row hide-on-print" style="justify-content: center; border: none; margin-bottom: 20px;">
+            <h2 style="font-size: 18px; color: var(--text-muted); text-shadow: none;">SYSTEM PREVIEW</h2>
+        </div>
         
-        <div id="receipt-wrapper">
-            <div class="receipt" id="receipt">
-                <!-- Receipt content injected by JS -->
+        <div class="receipt-shadow-box">
+            <div id="receipt-wrapper">
+                <div class="receipt" id="receipt">
+                    <!-- JS Injected Content -->
+                </div>
             </div>
         </div>
 
         <div class="actions hide-on-print">
-            <button class="action-btn btn-print" onclick="window.print()">🖨️ Print</button>
-            <button class="action-btn btn-pdf" onclick="downloadPDF()">📄 PDF</button>
-            <button class="action-btn btn-whatsapp" onclick="shareWhatsApp()">💬 WhatsApp</button>
+            <button class="action-btn btn-print" onclick="window.print()">PRINT</button>
+            <button class="action-btn btn-pdf" onclick="downloadPDF()">EXPORT PDF</button>
+            <button class="action-btn btn-whatsapp" onclick="shareWhatsApp()">SECURE COMM</button>
         </div>
     </div>
 
     <script>
         // Global Variables
         let currentLang = 'en';
-        let currentPayableAmount = 0; // For WhatsApp share
+        let currentPayableAmount = 0;
 
         // Translation Dictionary
         const i18n = {
@@ -290,39 +442,46 @@
             generateReceipt();
         }
 
-        // Auto-complete Logic
-        function loadParties() {
-            try {
-                const saved = JSON.parse(localStorage.getItem('savedParties') || '[]');
-                const list = document.getElementById('partyList');
-                list.innerHTML = '';
-                saved.forEach(p => {
-                    let opt = document.createElement('option');
-                    opt.value = p;
-                    list.appendChild(opt);
-                });
-            } catch (e) { console.error("Could not load parties"); }
+        // Universal Auto-complete Engine
+        function loadAllData() {
+            populateDatalist('savedParties', 'partyList');
+            populateDatalist('savedPlaces', 'placeList');
+            populateDatalist('savedGaadis', 'gaadiList');
+            populateDatalist('savedDescs', 'descList');
         }
 
-        function saveParty(name) {
-            name = name.toUpperCase().trim();
-            if (!name) return;
+        function populateDatalist(storageKey, listId) {
             try {
-                let saved = JSON.parse(localStorage.getItem('savedParties') || '[]');
-                if (!saved.includes(name)) {
-                    saved.push(name);
-                    localStorage.setItem('savedParties', JSON.stringify(saved));
-                    loadParties(); // Refresh the list
+                const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                const list = document.getElementById(listId);
+                if (!list) return;
+                list.innerHTML = '';
+                saved.forEach(item => {
+                    let opt = document.createElement('option');
+                    opt.value = item;
+                    list.appendChild(opt);
+                });
+            } catch (e) {}
+        }
+
+        function saveData(storageKey, value, listId) {
+            value = value.toUpperCase().trim();
+            if (!value) return;
+            try {
+                let saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                if (!saved.includes(value)) {
+                    saved.push(value);
+                    localStorage.setItem(storageKey, JSON.stringify(saved));
+                    populateDatalist(storageKey, listId); 
                 }
-            } catch (e) { console.error("Could not save party"); }
+            } catch (e) {}
         }
 
         // Auto Date Filler
         function setTodayDate() {
             const today = new Date();
-            const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            // Formats to e.g. "11 Sep 2026"
-            document.getElementById('date').value = today.toLocaleDateString('en-GB', options);
+            const options = { day: '2-digit', month: 'short', year: 'numeric' };
+            document.getElementById('date').value = today.toLocaleDateString('en-GB', options).toUpperCase();
         }
 
         function formatMoney(amount) {
@@ -333,14 +492,17 @@
             const id = `item_${Date.now()}`;
             const html = `
                 <div class="item-block" id="${id}">
-                    <button class="remove-btn" onclick="removeItem('${id}')">×</button>
+                    <button class="remove-btn" onclick="removeItem('${id}')">✕</button>
                     <div class="form-row">
-                        <div><label>Description</label><input type="text" class="i-desc"></div>
-                        <div><label>Bundles</label><input type="number" class="i-bundle"></div>
+                        <div>
+                            <label>Description</label>
+                            <input type="text" class="i-desc" list="descList" placeholder="Asset name" onblur="saveData('savedDescs', this.value, 'descList')">
+                        </div>
+                        <div><label>Units</label><input type="number" class="i-bundle" placeholder="Qty"></div>
                     </div>
                     <div class="form-row" style="margin-bottom:0;">
-                        <div><label>Weight (kg)</label><input type="number" class="i-weight"></div>
-                        <div><label>Rate (/kg)</label><input type="number" class="i-rate"></div>
+                        <div><label>Weight (kg)</label><input type="number" class="i-weight" placeholder="0"></div>
+                        <div><label>Rate (/kg)</label><input type="number" class="i-rate" placeholder="0"></div>
                     </div>
                 </div>
             `;
@@ -354,7 +516,7 @@
         }
 
         function generateReceipt() {
-            const t = i18n[currentLang]; // Get current translations
+            const t = i18n[currentLang];
 
             const partyName = document.getElementById('partyName').value.toUpperCase() || '---';
             const place = document.getElementById('place').value.toUpperCase() || '---';
@@ -386,7 +548,7 @@
             });
 
             if (itemsHTML === '') {
-                itemsHTML = '<div style="color:#999; margin:20px 0; text-align:center;">No items added</div>';
+                itemsHTML = '<div style="color:#7b849c; margin:25px 0; text-align:center; font-style:italic;">[ NO PAYLOAD DETECTED ]</div>';
             }
 
             const loading = parseFloat(document.getElementById('loading').value) || 0;
@@ -403,16 +565,20 @@
                 insurance = invoiceValue / 2824.699;
                 insInput.value = insurance.toFixed(2);
                 insInput.readOnly = true;
-                insInput.style.backgroundColor = '#e9ecef';
+                insInput.style.background = 'rgba(255, 204, 0, 0.1)';
+                insInput.style.borderColor = 'var(--bat-yellow)';
+                insInput.style.color = 'var(--bat-yellow)';
             } else {
                 insInput.readOnly = false;
-                insInput.style.backgroundColor = '';
+                insInput.style.background = 'var(--input-bg)';
+                insInput.style.borderColor = '#2a2e3d';
+                insInput.style.color = 'var(--text-main)';
                 insurance = parseFloat(insInput.value) || 0;
             }
 
             const grandTotal = subtotal + loading + insurance + transport;
             const amountPayable = grandTotal - advance;
-            currentPayableAmount = amountPayable; // Save for WhatsApp
+            currentPayableAmount = amountPayable; 
             
             let extrasHTML = '';
             if (loading > 0) extrasHTML += `<div class="row"><span>${t.loading}</span><span>${formatMoney(loading)}</span></div>`;
@@ -420,7 +586,7 @@
             if (insurance > 0) extrasHTML += `<div class="row"><span>${t.insurance}</span><span>${formatMoney(insurance)}</span></div>`;
             
             let advanceHTML = '';
-            if (advance > 0) advanceHTML = `<div class="row" style="font-style: italic;"><span>${t.advance}</span><span>- ${formatMoney(advance)}</span></div>`;
+            if (advance > 0) advanceHTML = `<div class="row" style="font-style: italic; color: #a0aec0;"><span>${t.advance}</span><span>- ${formatMoney(advance)}</span></div>`;
             
             let notesHTML = '';
             if (notes !== '') {
@@ -473,28 +639,40 @@
 
         // WhatsApp Share
         function shareWhatsApp() {
-            const party = document.getElementById('partyName').value.toUpperCase() || 'Customer';
+            const party = document.getElementById('partyName').value.toUpperCase() || 'TARGET';
             const gaadi = document.getElementById('gaadiNo').value.toUpperCase() || 'N/A';
             const date = document.getElementById('date').value || '';
             const payable = formatMoney(currentPayableAmount);
             
-            const message = `*Kaacha Parcha Details*\n----------------------\n*Party:* ${party}\n*Gaadi No:* ${gaadi}\n*Date:* ${date}\n*Amount Payable:* ${payable}\n----------------------`;
+            const message = `*LOGISTICS DATA*\n----------------------\n*ID:* ${party}\n*UNIT:* ${gaadi}\n*TIME:* ${date}\n*FUNDS REQ:* ${payable}\n----------------------`;
             
             const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
         }
 
+        // PDF generator
         function downloadPDF() {
             window.scrollTo(0, 0);
-            const element = document.getElementById('receipt-wrapper');
+            
+            const wrapper = document.getElementById('receipt-wrapper');
+            const shadowBox = document.querySelector('.receipt-shadow-box');
+            
+            wrapper.style.setProperty('border', 'none', 'important');
+            shadowBox.style.setProperty('filter', 'none', 'important');
+            wrapper.classList.add('hide-pseudo-for-pdf');
+            
+            const style = document.createElement('style');
+            style.innerHTML = '.hide-pseudo-for-pdf::before, .hide-pseudo-for-pdf::after { display: none !important; }';
+            document.head.appendChild(style);
+
             const opt = {
-                margin:       5,
-                filename:     'parcha.pdf',
+                margin:       [5, 5, 5, 5],
+                filename:     'parcha_batman.pdf',
                 image:        { type: 'jpeg', quality: 1 },
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true, 
-                    backgroundColor: '#f8f5ea', 
+                    backgroundColor: '#1a1e29', 
                     scrollY: 0,
                     windowY: 0
                 },
@@ -502,13 +680,18 @@
             };
             
             setTimeout(() => {
-                html2pdf().set(opt).from(element).save();
+                html2pdf().set(opt).from(wrapper).save().then(() => {
+                    wrapper.style.removeProperty('border');
+                    shadowBox.style.removeProperty('filter');
+                    wrapper.classList.remove('hide-pseudo-for-pdf');
+                    document.head.removeChild(style);
+                });
             }, 100);
         }
 
         window.onload = () => {
             setTodayDate();
-            loadParties();
+            loadAllData();
             addItem();
             generateReceipt();
         };
