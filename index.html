@@ -9,7 +9,7 @@
         :root {
             --bg-color: #f4f4f9;
             --primary-color: #333;
-            --receipt-bg: #f8f5ea; /* Warm cream color from the image */
+            --receipt-bg: #f8f5ea; 
             --receipt-text: #222;
         }
         body {
@@ -48,12 +48,21 @@
             margin-bottom: 4px;
             color: #555;
         }
-        input {
+        input, textarea {
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
         }
+        input[type="checkbox"] {
+            width: auto;
+            padding: 0;
+            margin: 0 4px 0 0;
+            vertical-align: middle;
+        }
+        textarea { resize: vertical; }
         
         .item-block {
             border: 1px solid #eee;
@@ -99,7 +108,6 @@
             box-sizing: border-box;
             display: block; 
             position: relative;
-            /* Added a subtle shadow just for web preview */
             box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
         }
         
@@ -110,7 +118,6 @@
             color: var(--receipt-text);
         }
         
-        /* Specific divider styles matching the image */
         .receipt .dashed-divider { border-bottom: 1px dashed #a09d94; margin: 12px 0; }
         .receipt .solid-divider { border-bottom: 1px solid var(--receipt-text); margin: 12px 0; }
         
@@ -122,7 +129,6 @@
         .receipt .item-details { display: flex; justify-content: space-between; align-items: flex-start; }
         .receipt .item-rate { max-width: 50%; }
         
-        /* Grand total box styling */
         .receipt .grand-total-box {
             background-color: #e8e4d8;
             padding: 10px;
@@ -131,6 +137,13 @@
             display: flex;
             justify-content: space-between;
             margin: 12px 0;
+        }
+
+        .receipt .notes-section {
+            font-size: 13px;
+            margin-top: 10px;
+            white-space: pre-wrap; 
+            word-wrap: break-word;
         }
 
         .actions { margin-top: 20px; display: flex; gap: 10px; justify-content: center; }
@@ -173,17 +186,36 @@
         </div>
         <div class="form-row">
             <div><label>Gaadi No.</label><input type="text" id="gaadiNo" value=""></div>
-            <div><label>Date (e.g. 10 Sept 2026)</label><input type="text" id="date" value=""></div>
+            <div><label>Date</label><input type="text" id="date" value=""></div>
         </div>
 
         <h3 style="font-size: 16px; margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Items</h3>
         <div id="items-container"></div>
         <button class="add-item-btn" onclick="addItem()">+ Add Item</button>
 
-        <h3 style="font-size: 16px; margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Charges</h3>
+        <h3 style="font-size: 16px; margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Charges & Advances</h3>
         <div class="form-row">
             <div><label>Loading (₹)</label><input type="number" id="loading" value=""></div>
-            <div><label>Insurance (₹)</label><input type="number" id="insurance" value=""></div>
+            <div><label>Transport (₹)</label><input type="number" id="transport" value=""></div>
+        </div>
+        <div class="form-row">
+            <div>
+                <label style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Insurance (₹)</span>
+                    <span style="font-weight: normal; font-size: 11px; cursor: pointer;">
+                        <input type="checkbox" id="autoInsure"> Auto
+                    </span>
+                </label>
+                <input type="number" id="insurance" value="">
+            </div>
+            <div><label>Advance Received (₹)</label><input type="number" id="advance" value=""></div>
+        </div>
+        
+        <div class="form-row" style="margin-top: 10px;">
+            <div style="flex: 1;">
+                <label>Notes / Remarks</label>
+                <textarea id="notes" rows="2" placeholder="Enter any extra details here..."></textarea>
+            </div>
         </div>
     </div>
 
@@ -238,9 +270,6 @@
             const gaadiNo = document.getElementById('gaadiNo').value.toUpperCase() || '---';
             const date = document.getElementById('date').value || '---';
 
-            const loading = parseFloat(document.getElementById('loading').value) || 0;
-            const insurance = parseFloat(document.getElementById('insurance').value) || 0;
-
             let itemsHTML = '';
             let subtotal = 0;
 
@@ -269,7 +298,50 @@
                 itemsHTML = '<div style="color:#999; margin:20px 0; text-align:center;">No items added</div>';
             }
 
-            const grandTotal = subtotal + loading + insurance;
+            // Fetch Loading, Transport, and Advance BEFORE calculating Insurance
+            const loading = parseFloat(document.getElementById('loading').value) || 0;
+            const transport = parseFloat(document.getElementById('transport').value) || 0;
+            const advance = parseFloat(document.getElementById('advance').value) || 0;
+            const notes = document.getElementById('notes').value.trim();
+
+            // Insurance Calculation Logic
+            const autoInsure = document.getElementById('autoInsure').checked;
+            const insInput = document.getElementById('insurance');
+            let insurance = 0;
+
+            if (autoInsure) {
+                // Formula: (Subtotal + Loading + Transport) / 2824.699
+                const invoiceValue = subtotal + loading + transport;
+                insurance = invoiceValue / 2824.699;
+                insInput.value = insurance.toFixed(2);
+                insInput.readOnly = true;
+                insInput.style.backgroundColor = '#e9ecef';
+            } else {
+                insInput.readOnly = false;
+                insInput.style.backgroundColor = '';
+                insurance = parseFloat(insInput.value) || 0;
+            }
+
+            const grandTotal = subtotal + loading + insurance + transport;
+            const amountPayable = grandTotal - advance;
+            
+            // Build Dynamic Rows (Only show if greater than 0)
+            let extrasHTML = '';
+            if (loading > 0) extrasHTML += `<div class="row"><span>LOADING</span><span>${formatMoney(loading)}</span></div>`;
+            if (transport > 0) extrasHTML += `<div class="row"><span>TRANSPORT</span><span>${formatMoney(transport)}</span></div>`;
+            if (insurance > 0) extrasHTML += `<div class="row"><span>INSURANCE</span><span>${formatMoney(insurance)}</span></div>`;
+            
+            let advanceHTML = '';
+            if (advance > 0) advanceHTML = `<div class="row" style="font-style: italic;"><span>LESS: ADVANCE</span><span>- ${formatMoney(advance)}</span></div>`;
+            
+            let notesHTML = '';
+            if (notes !== '') {
+                notesHTML = `
+                    <div class="notes-section">
+                        <strong>NOTES:</strong><br>${notes}
+                    </div>
+                `;
+            }
 
             const receiptHTML = `
                 <div class="dashed-divider"></div>
@@ -290,15 +362,22 @@
                 
                 <div class="dashed-divider"></div>
                 <div class="row"><span>SUBTOTAL</span><span>${formatMoney(subtotal)}</span></div>
-                <div class="row"><span>LOADING</span><span>${formatMoney(loading)}</span></div>
-                <div class="row"><span>INSURANCE</span><span>${formatMoney(insurance)}</span></div>
+                ${extrasHTML}
+                <div class="solid-divider"></div>
+                
+                <div class="row" style="font-weight:bold;">
+                    <span>GRAND TOTAL</span><span>${formatMoney(grandTotal)}</span>
+                </div>
+                ${advanceHTML}
+                
                 <div class="solid-divider"></div>
                 
                 <div class="grand-total-box">
-                    <span>GRAND TOTAL</span>
-                    <span>${formatMoney(grandTotal)}</span>
+                    <span>AMOUNT PAYABLE</span>
+                    <span>${formatMoney(amountPayable)}</span>
                 </div>
                 <div class="solid-divider"></div>
+                ${notesHTML}
             `;
 
             document.getElementById('receipt').innerHTML = receiptHTML;
@@ -316,11 +395,11 @@
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true, 
-                    backgroundColor: '#f8f5ea', // Match the receipt background color
+                    backgroundColor: '#f8f5ea', 
                     scrollY: 0,
                     windowY: 0
                 },
-                jsPDF:        { unit: 'mm', format: [100, 180], orientation: 'portrait' } 
+                jsPDF:        { unit: 'mm', format: [100, 190], orientation: 'portrait' } 
             };
             
             setTimeout(() => {
