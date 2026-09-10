@@ -30,8 +30,26 @@
             width: 100%;
             max-width: 450px;
         }
-        h2 { margin-top: 0; font-size: 20px; }
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        h2 { margin: 0; font-size: 20px; }
         
+        /* Language Toggle Button */
+        .lang-btn {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .lang-btn:hover { background-color: #e0e0e0; }
+
         .form-row {
             display: flex;
             gap: 10px;
@@ -146,18 +164,19 @@
             word-wrap: break-word;
         }
 
-        .actions { margin-top: 20px; display: flex; gap: 10px; justify-content: center; }
+        .actions { margin-top: 20px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
         button.action-btn {
-            padding: 10px 15px;
+            padding: 10px 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
             color: #fff;
-            flex: 1;
+            flex: 1 1 30%;
         }
         .btn-print { background-color: #6c757d; }
         .btn-pdf { background-color: #007bff; }
+        .btn-whatsapp { background-color: #25D366; } /* WhatsApp Green */
         button:hover { opacity: 0.9; }
 
         @media print {
@@ -177,51 +196,60 @@
 <body>
 
     <!-- Form Section -->
-    <div class="container hide-on-print" oninput="generateReceipt()">
-        <h2>Parcha Details</h2>
+    <div class="container hide-on-print">
+        <div class="header-row">
+            <h2>Parcha Details</h2>
+            <button class="lang-btn" onclick="toggleLanguage()" id="langToggle">EN / हिंदी</button>
+        </div>
         
-        <div class="form-row">
-            <div><label>Party Name</label><input type="text" id="partyName" value=""></div>
-            <div><label>Place</label><input type="text" id="place" value=""></div>
-        </div>
-        <div class="form-row">
-            <div><label>Gaadi No.</label><input type="text" id="gaadiNo" value=""></div>
-            <div><label>Date</label><input type="text" id="date" value=""></div>
-        </div>
-
-        <h3 style="font-size: 16px; margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Items</h3>
-        <div id="items-container"></div>
-        <button class="add-item-btn" onclick="addItem()">+ Add Item</button>
-
-        <h3 style="font-size: 16px; margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Charges & Advances</h3>
-        <div class="form-row">
-            <div><label>Loading (₹)</label><input type="number" id="loading" value=""></div>
-            <div><label>Transport (₹)</label><input type="number" id="transport" value=""></div>
-        </div>
-        <div class="form-row">
-            <div>
-                <label style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>Insurance (₹)</span>
-                    <span style="font-weight: normal; font-size: 11px; cursor: pointer;">
-                        <input type="checkbox" id="autoInsure"> Auto
-                    </span>
-                </label>
-                <input type="number" id="insurance" value="">
+        <div id="mainForm" oninput="generateReceipt()">
+            <div class="form-row">
+                <div>
+                    <label>Party Name</label>
+                    <input type="text" id="partyName" list="partyList" value="" onblur="saveParty(this.value)">
+                    <datalist id="partyList"></datalist>
+                </div>
+                <div><label>Place</label><input type="text" id="place" value=""></div>
             </div>
-            <div><label>Advance Received (₹)</label><input type="number" id="advance" value=""></div>
-        </div>
-        
-        <div class="form-row" style="margin-top: 10px;">
-            <div style="flex: 1;">
-                <label>Notes / Remarks</label>
-                <textarea id="notes" rows="2" placeholder="Enter any extra details here..."></textarea>
+            <div class="form-row">
+                <div><label>Gaadi No.</label><input type="text" id="gaadiNo" value=""></div>
+                <div><label>Date</label><input type="text" id="date" value=""></div>
+            </div>
+
+            <h3 style="font-size: 16px; margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Items</h3>
+            <div id="items-container"></div>
+            <button class="add-item-btn" onclick="addItem()">+ Add Item</button>
+
+            <h3 style="font-size: 16px; margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Charges & Advances</h3>
+            <div class="form-row">
+                <div><label>Loading (₹)</label><input type="number" id="loading" value=""></div>
+                <div><label>Transport (₹)</label><input type="number" id="transport" value=""></div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Insurance (₹)</span>
+                        <span style="font-weight: normal; font-size: 11px; cursor: pointer;">
+                            <input type="checkbox" id="autoInsure"> Auto
+                        </span>
+                    </label>
+                    <input type="number" id="insurance" value="">
+                </div>
+                <div><label>Advance Received (₹)</label><input type="number" id="advance" value=""></div>
+            </div>
+            
+            <div class="form-row" style="margin-top: 10px;">
+                <div style="flex: 1;">
+                    <label>Notes / Remarks</label>
+                    <textarea id="notes" rows="2" placeholder="Enter any extra details here..."></textarea>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Preview Section -->
     <div class="container">
-        <h2 class="hide-on-print">Live Preview</h2>
+        <h2 class="hide-on-print" style="margin-bottom: 15px;">Live Preview</h2>
         
         <div id="receipt-wrapper">
             <div class="receipt" id="receipt">
@@ -232,10 +260,71 @@
         <div class="actions hide-on-print">
             <button class="action-btn btn-print" onclick="window.print()">🖨️ Print</button>
             <button class="action-btn btn-pdf" onclick="downloadPDF()">📄 PDF</button>
+            <button class="action-btn btn-whatsapp" onclick="shareWhatsApp()">💬 WhatsApp</button>
         </div>
     </div>
 
     <script>
+        // Global Variables
+        let currentLang = 'en';
+        let currentPayableAmount = 0; // For WhatsApp share
+
+        // Translation Dictionary
+        const i18n = {
+            en: {
+                party: "PARTY", place: "PLACE", gaadi: "GAADI NO.", date: "DATE", 
+                items: "ITEM DETAILS", amount: "AMOUNT", subtotal: "SUBTOTAL", 
+                loading: "LOADING", transport: "TRANSPORT", insurance: "INSURANCE", 
+                grand: "GRAND TOTAL", advance: "LESS: ADVANCE", payable: "AMOUNT PAYABLE", notes: "NOTES:"
+            },
+            hi: {
+                party: "पार्टी", place: "स्थान", gaadi: "गाड़ी नं.", date: "दिनांक", 
+                items: "सामग्री विवरण", amount: "राशि", subtotal: "उपकुल", 
+                loading: "लोडिंग", transport: "परिवहन", insurance: "बीमा", 
+                grand: "कुल योग", advance: "छूट: अग्रिम", payable: "देय राशि", notes: "नोट्स:"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'hi' : 'en';
+            generateReceipt();
+        }
+
+        // Auto-complete Logic
+        function loadParties() {
+            try {
+                const saved = JSON.parse(localStorage.getItem('savedParties') || '[]');
+                const list = document.getElementById('partyList');
+                list.innerHTML = '';
+                saved.forEach(p => {
+                    let opt = document.createElement('option');
+                    opt.value = p;
+                    list.appendChild(opt);
+                });
+            } catch (e) { console.error("Could not load parties"); }
+        }
+
+        function saveParty(name) {
+            name = name.toUpperCase().trim();
+            if (!name) return;
+            try {
+                let saved = JSON.parse(localStorage.getItem('savedParties') || '[]');
+                if (!saved.includes(name)) {
+                    saved.push(name);
+                    localStorage.setItem('savedParties', JSON.stringify(saved));
+                    loadParties(); // Refresh the list
+                }
+            } catch (e) { console.error("Could not save party"); }
+        }
+
+        // Auto Date Filler
+        function setTodayDate() {
+            const today = new Date();
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            // Formats to e.g. "11 Sep 2026"
+            document.getElementById('date').value = today.toLocaleDateString('en-GB', options);
+        }
+
         function formatMoney(amount) {
             return '₹' + parseFloat(amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
@@ -265,6 +354,8 @@
         }
 
         function generateReceipt() {
+            const t = i18n[currentLang]; // Get current translations
+
             const partyName = document.getElementById('partyName').value.toUpperCase() || '---';
             const place = document.getElementById('place').value.toUpperCase() || '---';
             const gaadiNo = document.getElementById('gaadiNo').value.toUpperCase() || '---';
@@ -298,19 +389,16 @@
                 itemsHTML = '<div style="color:#999; margin:20px 0; text-align:center;">No items added</div>';
             }
 
-            // Fetch Loading, Transport, and Advance BEFORE calculating Insurance
             const loading = parseFloat(document.getElementById('loading').value) || 0;
             const transport = parseFloat(document.getElementById('transport').value) || 0;
             const advance = parseFloat(document.getElementById('advance').value) || 0;
             const notes = document.getElementById('notes').value.trim();
 
-            // Insurance Calculation Logic
             const autoInsure = document.getElementById('autoInsure').checked;
             const insInput = document.getElementById('insurance');
             let insurance = 0;
 
             if (autoInsure) {
-                // Formula: (Subtotal + Loading + Transport) / 2824.699
                 const invoiceValue = subtotal + loading + transport;
                 insurance = invoiceValue / 2824.699;
                 insInput.value = insurance.toFixed(2);
@@ -324,21 +412,21 @@
 
             const grandTotal = subtotal + loading + insurance + transport;
             const amountPayable = grandTotal - advance;
+            currentPayableAmount = amountPayable; // Save for WhatsApp
             
-            // Build Dynamic Rows (Only show if greater than 0)
             let extrasHTML = '';
-            if (loading > 0) extrasHTML += `<div class="row"><span>LOADING</span><span>${formatMoney(loading)}</span></div>`;
-            if (transport > 0) extrasHTML += `<div class="row"><span>TRANSPORT</span><span>${formatMoney(transport)}</span></div>`;
-            if (insurance > 0) extrasHTML += `<div class="row"><span>INSURANCE</span><span>${formatMoney(insurance)}</span></div>`;
+            if (loading > 0) extrasHTML += `<div class="row"><span>${t.loading}</span><span>${formatMoney(loading)}</span></div>`;
+            if (transport > 0) extrasHTML += `<div class="row"><span>${t.transport}</span><span>${formatMoney(transport)}</span></div>`;
+            if (insurance > 0) extrasHTML += `<div class="row"><span>${t.insurance}</span><span>${formatMoney(insurance)}</span></div>`;
             
             let advanceHTML = '';
-            if (advance > 0) advanceHTML = `<div class="row" style="font-style: italic;"><span>LESS: ADVANCE</span><span>- ${formatMoney(advance)}</span></div>`;
+            if (advance > 0) advanceHTML = `<div class="row" style="font-style: italic;"><span>${t.advance}</span><span>- ${formatMoney(advance)}</span></div>`;
             
             let notesHTML = '';
             if (notes !== '') {
                 notesHTML = `
                     <div class="notes-section">
-                        <strong>NOTES:</strong><br>${notes}
+                        <strong>${t.notes}</strong><br>${notes}
                     </div>
                 `;
             }
@@ -347,33 +435,33 @@
                 <div class="dashed-divider"></div>
                 <div class="solid-divider"></div>
                 
-                <div class="row"><span>PARTY</span><span>${partyName}</span></div>
-                <div class="row"><span>PLACE</span><span>${place}</span></div>
-                <div class="row"><span>GAADI NO.</span><span>${gaadiNo}</span></div>
-                <div class="row"><span>DATE</span><span>${date}</span></div>
+                <div class="row"><span>${t.party}</span><span>${partyName}</span></div>
+                <div class="row"><span>${t.place}</span><span>${place}</span></div>
+                <div class="row"><span>${t.gaadi}</span><span>${gaadiNo}</span></div>
+                <div class="row"><span>${t.date}</span><span>${date}</span></div>
                 
                 <div class="dashed-divider"></div>
                 <div class="row" style="font-weight:bold;">
-                    <span>ITEM DETAILS</span><span>AMOUNT</span>
+                    <span>${t.items}</span><span>${t.amount}</span>
                 </div>
                 <div class="dashed-divider"></div>
                 
                 ${itemsHTML}
                 
                 <div class="dashed-divider"></div>
-                <div class="row"><span>SUBTOTAL</span><span>${formatMoney(subtotal)}</span></div>
+                <div class="row"><span>${t.subtotal}</span><span>${formatMoney(subtotal)}</span></div>
                 ${extrasHTML}
                 <div class="solid-divider"></div>
                 
                 <div class="row" style="font-weight:bold;">
-                    <span>GRAND TOTAL</span><span>${formatMoney(grandTotal)}</span>
+                    <span>${t.grand}</span><span>${formatMoney(grandTotal)}</span>
                 </div>
                 ${advanceHTML}
                 
                 <div class="solid-divider"></div>
                 
                 <div class="grand-total-box">
-                    <span>AMOUNT PAYABLE</span>
+                    <span>${t.payable}</span>
                     <span>${formatMoney(amountPayable)}</span>
                 </div>
                 <div class="solid-divider"></div>
@@ -383,11 +471,22 @@
             document.getElementById('receipt').innerHTML = receiptHTML;
         }
 
+        // WhatsApp Share
+        function shareWhatsApp() {
+            const party = document.getElementById('partyName').value.toUpperCase() || 'Customer';
+            const gaadi = document.getElementById('gaadiNo').value.toUpperCase() || 'N/A';
+            const date = document.getElementById('date').value || '';
+            const payable = formatMoney(currentPayableAmount);
+            
+            const message = `*Kaacha Parcha Details*\n----------------------\n*Party:* ${party}\n*Gaadi No:* ${gaadi}\n*Date:* ${date}\n*Amount Payable:* ${payable}\n----------------------`;
+            
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
         function downloadPDF() {
             window.scrollTo(0, 0);
-            
             const element = document.getElementById('receipt-wrapper');
-            
             const opt = {
                 margin:       5,
                 filename:     'parcha.pdf',
@@ -408,6 +507,8 @@
         }
 
         window.onload = () => {
+            setTodayDate();
+            loadParties();
             addItem();
             generateReceipt();
         };
